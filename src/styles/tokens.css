@@ -1,0 +1,99 @@
+/* RJ Performance — tokens da marca (Tailwind CSS v4)
+   Cores extraídas da logo oficial (public/brand). ÚNICO arquivo onde hex é permitido.
+   Importado por src/styles/global.css. */
+
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/archivo/wdth-italic.css";
+
+@theme {
+  /* ---- Cores ---- */
+  --color-preto: #000000; /* fundo base: o mesmo preto puro da logo */
+  --color-carbono: #141414; /* superfícies elevadas: formulário, modal, acordeão aberto */
+  --color-grafite: #262626; /* bordas e divisores discretos */
+  --color-concreto: #8c8c8c; /* texto secundário (tom da parede de cimento das fotos) — AA sobre preto */
+  --color-giz: #eeeeee; /* texto principal (o branco do "R" da logo) */
+  --color-ouro: #ce9e38; /* dourado principal: CTA, linha, foco — AA sobre preto (8.8:1) */
+  --color-ouro-claro: #f7cb68; /* brilho do dourado, hover do CTA */
+  --color-ouro-escuro: #98621a; /* SÓ em gradiente/ornamento. Proibido em texto (contraste insuficiente) */
+  --color-whatsapp: #25d366; /* uso restrito ao ícone do WhatsApp */
+
+  /* ---- Tipografia: uma família, o eixo de largura faz o contraste ---- */
+  --font-sans: "Archivo Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Archivo Variable", system-ui, sans-serif;
+
+  /* Escala (base 17px, razão ~1.25; títulos fluidos) */
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: clamp(1.75rem, 1.2rem + 2.2vw, 2.5rem);
+  --text-3xl: clamp(2.25rem, 1.4rem + 3.8vw, 4rem);
+  --text-mega: clamp(3.75rem, 0.5rem + 14vw, 13rem); /* PERFORMANCE do hero */
+
+  /* ---- Movimento ---- */
+  --ease-arrancada: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-tap: 180ms;
+  --duration-troca: 320ms;
+
+  /* ---- Layout ---- */
+  --container-site: 80rem; /* 1280px */
+  --radius-chip: 999px;
+  --radius-painel: 4px; /* cantos quase retos: a marca é angular */
+}
+
+/* Utilitários de tipo da marca */
+@utility display-largo {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-style: italic;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+@utility titulo {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+@utility lema {
+  /* Exclusivo para "Disciplina • Evolução • Propósito", como na logo */
+  font-stretch: 110%;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+@utility linha-ouro {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-ouro-escuro),
+    var(--color-ouro) 35%,
+    var(--color-ouro-claro) 65%,
+    var(--color-ouro)
+  );
+}
+
+@utility texto-ouro {
+  background: linear-gradient(
+    160deg,
+    var(--color-ouro-claro) 0%,
+    var(--color-ouro) 45%,
+    var(--color-ouro-escuro) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility superficie-concreto {
+  background-color: var(--color-preto);
+  background-image:
+    linear-gradient(180deg, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.85)), url("/images/textura-concreto.webp");
+  background-size: cover;
+}
