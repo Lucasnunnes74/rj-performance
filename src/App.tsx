@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { Abertura } from "@/components/ui/Abertura";
+import { useRolagemSuave } from "@/lib/useRolagemSuave";
 import { PerfilProvider } from "@/lib/perfil";
 import { Navbar } from "@/components/sections/Navbar";
 import { Hero } from "@/components/sections/Hero";
@@ -19,6 +20,7 @@ import { WhatsAppFlutuante } from "@/components/sections/WhatsAppFlutuante";
 
 export default function App() {
   const [aberta, setAberta] = useState(true);
+  useRolagemSuave();
   const fechar = useCallback(() => setAberta(false), []);
 
   return (

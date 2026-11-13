@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { contato, lema } from "@/content/site";
 
 /** Duas faixas em sentidos opostos: o lema em cima, o nome da marca vazado embaixo. */
 export function Lema() {
+  const [pausado, setPausado] = useState(false);
   const grupo = lema.flatMap((p, i) => [
     <span key={p} className="text-giz">
       {p}
@@ -13,8 +15,18 @@ export function Lema() {
   const marca = contato.marca.toUpperCase();
   return (
     <section
+      role="button"
+      tabIndex={0}
+      aria-pressed={pausado}
       aria-label={lema.join(" • ")}
-      className="letreiro-pausa overflow-hidden border-y border-grafite bg-preto py-4 md:py-6"
+      onClick={() => setPausado((p) => !p)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setPausado((p) => !p);
+        }
+      }}
+      className={`letreiro-pausa cursor-pointer ${pausado ? "letreiro-pausado" : ""} overflow-hidden border-y border-grafite bg-preto py-4 md:py-6`}
     >
       <div aria-hidden="true" className="letreiro lema flex w-max text-base whitespace-nowrap md:text-lg">
         {[0, 1].map((n) => (

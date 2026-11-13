@@ -33,10 +33,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-    *,
+    *:not(.letreiro):not(.letreiro-inverso),
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
@@ -78,11 +75,22 @@
       animation-play-state: paused;
     }
   }
+  /* Movimento reduzido: o letreiro continua, bem mais lento, e pode ser pausado com um toque */
   @media (prefers-reduced-motion: reduce) {
-    .letreiro,
-    .letreiro-inverso {
-      animation: none;
+    .letreiro {
+      animation-duration: 140s;
     }
+    .letreiro-inverso {
+      animation-duration: 240s;
+    }
+  }
+  .letreiro-pausado .letreiro,
+  .letreiro-pausado .letreiro-inverso {
+    animation-play-state: paused;
+  }
+  .letreiro,
+  .letreiro-inverso {
+    will-change: transform;
   }
   /* Palavra grande só em traço, em cinza de cimento: o segundo "grito" visual sem gastar dourado */
   .contorno-concreto {
