@@ -275,6 +275,7 @@ export const ui = {
   anterior: "Reel anterior",
   proximo: "Próximo reel",
   irPara: "Ir para o reel",
+  tocar: "Tocar o reel",
   abrirPost: "Abrir",
   verReel: "Assistir reel",
   verPost: "Ver post",

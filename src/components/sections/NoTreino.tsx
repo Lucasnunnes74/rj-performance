@@ -1,4 +1,11 @@
-import { useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { conteudo, ui } from "@/content/site";
 import { perfilInstagram, urlEmbed } from "@/content/instagram";
@@ -21,9 +28,37 @@ const seta =
 export function NoTreino() {
   const posts = useReelsInstagram();
   const [ativo, setAtivo] = useState(0);
+  const secao = useRef<HTMLElement>(null);
   const inicioX = useRef<number | null>(null);
+  const arrastou = useRef(false);
+  const [carregar, setCarregar] = useState(false);
+  const [prontos, setProntos] = useState<Set<string>>(new Set());
+  const [tocando, setTocando] = useState<number | null>(null);
   const total = posts.length;
-  const ir = (i: number) => setAtivo(Math.max(0, Math.min(total - 1, i)));
+  const ir = (i: number) => {
+    setAtivo(Math.max(0, Math.min(total - 1, i)));
+    setTocando(null);
+  };
+
+  // Começa a carregar os players quando a seção está a ~1,5 tela de distância (antes de o usuário chegar)
+  useEffect(() => {
+    const el = secao.current;
+    if (!el) return;
+    const ligar = () => setCarregar(true);
+    // Reserva: se o observador não disparar (aba em segundo plano, navegadores antigos), carrega após 4 s
+    const reserva = window.setTimeout(ligar, 4000);
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) ligar();
+      },
+      { rootMargin: "1400px 0px" },
+    );
+    io.observe(el);
+    return () => {
+      window.clearTimeout(reserva);
+      io.disconnect();
+    };
+  }, []);
 
   const aoTeclar = (e: KeyboardEvent) => {
     if (e.key === "ArrowLeft") ir(ativo - 1);
@@ -33,11 +68,13 @@ export function NoTreino() {
     if (inicioX.current === null) return;
     const dx = e.clientX - inicioX.current;
     inicioX.current = null;
-    if (Math.abs(dx) > 50) ir(ativo + (dx < 0 ? 1 : -1));
+    arrastou.current = Math.abs(dx) > 10;
+    if (Math.abs(dx) > 40) ir(ativo + (dx < 0 ? 1 : -1));
   };
 
   return (
     <section
+      ref={secao}
       id="no-treino"
       className={`overflow-hidden bg-preto ${total > 0 ? "py-20 md:py-28" : "border-y border-grafite py-14 md:py-16"}`}
     >
@@ -66,10 +103,13 @@ export function NoTreino() {
                 aria-label={ui.carrossel}
                 tabIndex={0}
                 onKeyDown={aoTeclar}
-                onPointerDown={(e) => (inicioX.current = e.clientX)}
+                onPointerDown={(e) => {
+                  inicioX.current = e.clientX;
+                  arrastou.current = false;
+                }}
                 onPointerUp={aoSoltar}
                 onPointerCancel={() => (inicioX.current = null)}
-                className="relative -mx-5 mt-10 h-[34rem] overflow-hidden outline-offset-4 md:-mx-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mx-0 lg:mt-0 lg:-mr-[max(2rem,calc((100vw-80rem)/2+2rem))]"
+                className="relative -mx-5 mt-10 h-[34rem] touch-pan-y overflow-hidden outline-offset-4 md:-mx-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mx-0 lg:mt-0 lg:-mr-[max(2rem,calc((100vw-80rem)/2+2rem))]"
               >
                 <ul
                   className="absolute top-0 left-1/2 flex h-full items-start gap-5 transition-transform duration-[420ms] ease-arrancada [transform:translateX(calc(var(--n)*-19.75rem_-_9.25rem))] lg:left-0 lg:[transform:translateX(calc(var(--n)*-19.75rem))]"
@@ -77,7 +117,8 @@ export function NoTreino() {
                 >
                   {posts.map((p, i) => {
                     const atual = i === ativo;
-                    const perto = Math.abs(i - ativo) <= 2;
+                    const perto = carregar && Math.abs(i - ativo) <= 1;
+                    const pronto = prontos.has(p.id);
                     return (
                       <li
                         key={p.id}
@@ -87,22 +128,37 @@ export function NoTreino() {
                           atual ? "border-ouro" : "scale-[0.94] border-grafite opacity-50"
                         }`}
                       >
-                        {perto ? (
+                        <span className="superficie-concreto absolute inset-0 grid place-items-center">
+                          <span className="grid size-16 place-items-center rounded-full border-2 border-ouro text-ouro">
+                            <Play aria-hidden="true" size={26} fill="currentColor" />
+                          </span>
+                        </span>
+                        {perto && (
                           <iframe
                             src={urlEmbed(p)}
                             title={`${ui.carrossel}: ${p.legenda}`}
-                            loading="lazy"
                             scrolling="no"
                             allowFullScreen
                             tabIndex={atual ? 0 : -1}
-                            className="absolute -top-[3.3rem] left-1/2 h-[calc(100%+12rem)] w-[143%] -translate-x-1/2 border-0"
+                            onLoad={() => setProntos((a) => new Set(a).add(p.id))}
+                            className={`absolute -top-[3.3rem] left-1/2 h-[calc(100%+12rem)] w-[143%] -translate-x-1/2 border-0 transition-opacity duration-[420ms] ${
+                              pronto ? "opacity-100" : "opacity-0"
+                            }`}
                           />
-                        ) : (
-                          <span className="superficie-concreto grid size-full place-items-center">
-                            <span className="grid size-16 place-items-center rounded-full border-2 border-ouro text-ouro">
+                        )}
+                        {atual && tocando !== i && (
+                          <button
+                            type="button"
+                            aria-label={`${ui.tocar} ${i + 1}`}
+                            onClick={() => {
+                              if (!arrastou.current) setTocando(i);
+                            }}
+                            className="absolute inset-0 z-10 grid touch-pan-y place-items-center"
+                          >
+                            <span className="grid size-16 place-items-center rounded-full border-2 border-ouro bg-preto/60 text-ouro">
                               <Play aria-hidden="true" size={26} fill="currentColor" />
                             </span>
-                          </span>
+                          </button>
                         )}
                         {!atual && (
                           <button

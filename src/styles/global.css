@@ -71,9 +71,12 @@
   .letreiro-inverso {
     animation: letreiro-inverso 70s linear infinite;
   }
-  .letreiro-pausa:hover .letreiro,
-  .letreiro-pausa:hover .letreiro-inverso {
-    animation-play-state: paused;
+  /* Pausa no hover só em dispositivos com mouse (no toque o :hover "gruda" e parava o letreiro) */
+  @media (hover: hover) {
+    .letreiro-pausa:hover .letreiro,
+    .letreiro-pausa:hover .letreiro-inverso {
+      animation-play-state: paused;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .letreiro,
